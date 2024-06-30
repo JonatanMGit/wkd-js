@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240312.0",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "openpgp": "^5.11.1",
+    "zbase32": "^2.0.3"
+  }
+}
