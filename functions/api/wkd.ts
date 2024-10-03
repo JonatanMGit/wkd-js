@@ -8,6 +8,7 @@ interface KeyCheckResult {
     key_available: boolean;
     keyCorsValid: boolean;
     keyType: KeyType;
+    fingerprint: string | null;
     emailInKey: boolean;
     valid: boolean;
 }
@@ -65,6 +66,7 @@ const checkKey = async (url: string, policy: string, options: RequestInit, email
         key_available: !!keyData.response,
         keyCorsValid: keyData.corsValid,
         keyType: KeyType.Invalid,
+        fingerprint: null,
         emailInKey: false,
         valid: false,
     };
@@ -77,6 +79,7 @@ const checkKey = async (url: string, policy: string, options: RequestInit, email
         if (key) {
             const identities = await key.getUserIDs();
             result.emailInKey = identities.some(identity => identity.includes(email));
+            result.fingerprint = key.getFingerprint().toUpperCase();
         }
     }
 
@@ -119,7 +122,7 @@ export const onRequest: PagesFunction = async (context) => {
     const basicUrl = `https://${domain}/.well-known/openpgpkey/hu/${hash}?l=${nameParam}`;
     const basicPolicyUrl = `https://${domain}/.well-known/openpgpkey/policy`;
     const advancedUrl = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/hu/${hash}?l=${nameParam}`;
-    const advancedPolicyUrl = `https://openpgpkey.${domain}/.well-known/openpgpkey/policy`;
+    const advancedPolicyUrl = `https://openpgpkey.${domain}/.well-known/openpgpkey/${domain}/policy`;
 
     const [advancedResult, directResult] = await Promise.all([
         checkKey(advancedUrl, advancedPolicyUrl, options, email),
